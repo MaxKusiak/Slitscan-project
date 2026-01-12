@@ -296,9 +296,10 @@ def image(file_path, speed, start_x, end_x, start_y, end_y, start_frame, end_fra
     win.destroy()
     tk.messagebox.showinfo("Готово", f"Обробка завершена! Файл збережено як {file_name}-slitscan_v1-speed_{v(0)}-startx_{start_x}-endx_{end_x}-starty_{start_y}-endy_{end_y}-startframe_{start_frame}-endframe_{end_frame}.png")
     
-    h, w = image.shape[:2]
-    scale = min(960 / w, 540 / h)
-    resized = cv2.resize(image, (int(w * scale), int(h * scale)))
-    cv2.imshow("Result", resized)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    # h, w = image.shape[:2]
+    # scale = min(960 / w, 540 / h)
+    # resized = cv2.resize(image, (int(w * scale), int(h * scale)))
+    # cv2.imshow("Result", resized)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
+    os.startfile(f'{download_folder}/{file_name}-slitscan_v1-speed_{v(0)}-startx_{start_x}-endx_{end_x}-starty_{start_y}-endy_{end_y}-startframe_{start_frame}-endframe_{end_frame}.png')
