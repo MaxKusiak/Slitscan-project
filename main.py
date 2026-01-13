@@ -99,6 +99,31 @@ other_params_frame.grid(row=4, column=0, sticky="w", pady=(20,0))
 #         self.canvas.coords(self.image_id, (400 - image.width) / 2, (225 - image.height) / 2)
 
 canvas = tk.Canvas(choose_file_frame, width=400, height=225, bg="gray")
+image_id = canvas.create_image(0, 0, anchor="nw")
+
+def change_image(image_id=image_id, canvas=canvas):
+    frame_index = int(start_frame.get()) - 1
+    with open(FILE_PARAMS_FILE, 'r') as f:
+        file_params = json.load(f)
+        file_path = file_params["file_path"]
+    cap = cv2.VideoCapture(file_path)
+    cap.set(cv2.CAP_PROP_POS_FRAMES, frame_index)
+    ret, frame = cap.read()
+    image1 = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    image = Image.fromarray(image1)
+    c = 0
+    if image.width >= image.height:
+        c = image.width / 400
+    else:
+        c = image.height / 225
+    image = image.resize((int(image.width / c), int(image.height / c)), Image.LANCZOS)
+    photo = ImageTk.PhotoImage(image)
+    image_id = canvas.create_image((400 - image.width) / 2, (225 - image.height) / 2, anchor="nw", image=photo)
+    canvas.itemconfig(image_id, image=photo)
+    canvas.coords(image_id, (400 - image.width) / 2, (225 - image.height) / 2)
+    canvas.image = photo
+    cap.release()
+
 # image_id = canvas.create_image(0, 0, anchor="nw", image=None)
 
 # def change_image(image_path, canvas=canvas, image_id=image_id):
@@ -124,8 +149,8 @@ canvas = tk.Canvas(choose_file_frame, width=400, height=225, bg="gray")
 # end_y_entry = None
 # speed_label = None
 # speed_entry = None
-# start_frame_label = None
-# start_frame_entry = None
+start_frame_label = tk.Label(other_params_frame, text="")
+start_frame_entry = tk.Entry(other_params_frame, textvariable=start_frame)
 speed_const_label = tk.Label(other_params_frame, text="Константа для зміни швидкості:")
 speed_const_entry = tk.Entry(other_params_frame, textvariable=static_var)
 def choose_file():
@@ -189,8 +214,13 @@ def choose_file():
         # speed_const_entry.grid(row=5, column=1, sticky="w", pady=(0,20))
 
         start_frame.set("1")
-        tk.Label(other_params_frame, text=f"Введіть початковий кадр (від 1 до {frame_count}):").grid(row=6, column=0, sticky="w")
-        tk.Entry(other_params_frame, textvariable=start_frame).grid(row=7, column=0, sticky="w", pady=(0,20))
+        start_frame_label.config(text=f"Введіть початковий кадр (від 1 до {frame_count}):")
+        start_frame_label.grid(row=6, column=0, sticky="w")
+        start_frame_entry.grid(row=7, column=0, sticky="w", pady=(0,20))
+        start_frame_entry.bind("<Return>", change_image)
+        # tk.Label(other_params_frame, text=f"Введіть початковий кадр (від 1 до {frame_count}):").grid(row=6, column=0, sticky="w")
+        # tk.Entry(other_params_frame, textvariable=start_frame).grid(row=7, column=0, sticky="w", pady=(0,20))
+        
 
         complete_button.grid(row=5, column=0, sticky="w")
 
