@@ -53,8 +53,8 @@ def video(file_path, speed, start_x, end_x, start_y, end_y, start_frame, end_fra
     win.title("Processing...")
     win.geometry("300x50")
 
-    lablel = tk.Label(win, text="Processing... 0.0%")
-    lablel.grid(row=0, column=0, padx=10, pady=5)
+    label = tk.Label(win, text="Processing... 0.0%")
+    label.grid(row=0, column=0, padx=10, pady=5)
 
     bar = ttk.Progressbar(win, length=280, mode='determinate', maximum=100)
     bar.grid(row=1, column=0, padx=10, pady=5)
@@ -150,7 +150,7 @@ def video(file_path, speed, start_x, end_x, start_y, end_y, start_frame, end_fra
             #         if t >= image_width:
             #             break
             
-            # lablel.config(text=f"Processing... {round((t * 100) / image_width, 2)}%")
+            # label.config(text=f"Processing... {round((t * 100) / image_width, 2)}%")
             # bar['value'] = round((t * 100) / image_width, 2)
             # win.update()
             h1 = h2
@@ -160,7 +160,7 @@ def video(file_path, speed, start_x, end_x, start_y, end_y, start_frame, end_fra
         k += 1
         b += step
 
-        lablel.config(text=f"Processing... {round((k * 100) / len(m), 2)}%")
+        label.config(text=f"Processing... {round((k * 100) / len(m), 2)}%")
         bar['value'] = round((k * 100) / len(m), 2)
         win.update()
         # print(round((k * 100) / len(m), 2), "%")
@@ -217,8 +217,8 @@ def image(file_path, speed, start_x, end_x, start_y, end_y, start_frame, end_fra
     win.title("Processing...")
     win.geometry("300x50")
 
-    lablel = tk.Label(win, text="Processing... 0.0%")
-    lablel.grid(row=0, column=0, padx=10, pady=5)
+    label = tk.Label(win, text="Processing... 0.0%")
+    label.grid(row=0, column=0, padx=10, pady=5)
 
     bar = ttk.Progressbar(win, length=280, mode='determinate', maximum=100)
     bar.grid(row=1, column=0, padx=10, pady=5)
@@ -243,7 +243,7 @@ def image(file_path, speed, start_x, end_x, start_y, end_y, start_frame, end_fra
         if f:
             image[:, k, :] = frame[start_y:end_y + 1, j, :]
 
-            lablel.config(text=f"Processing... {round((k * 100) / image_width, 2)}%")
+            label.config(text=f"Processing... {round((k * 100) / image_width, 2)}%")
             bar['value'] = round((k * 100) / image_width, 2)
             win.update()
             k += 1
@@ -257,7 +257,7 @@ def image(file_path, speed, start_x, end_x, start_y, end_y, start_frame, end_fra
             # k += 1
             # if k >= image_width:
             #     break    
-            # lablel.config(text=f"Processing... {round((k * 100) / image_width, 2)}%")
+            # label.config(text=f"Processing... {round((k * 100) / image_width, 2)}%")
             # bar['value'] = round((k * 100) / image_width, 2)
             # win.update()
 
@@ -278,7 +278,7 @@ def image(file_path, speed, start_x, end_x, start_y, end_y, start_frame, end_fra
                 if j >= end_x + 1:
                     break
 
-                lablel.config(text=f"Processing... {round((k * 100) / image_width, 2)}%")
+                label.config(text=f"Processing... {round((k * 100) / image_width, 2)}%")
                 bar['value'] = round((k * 100) / image_width, 2)
                 win.update()
             if k >= image_width:

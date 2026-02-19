@@ -5,7 +5,7 @@ from tkinter import filedialog
 import threading
 import json
 import cv2
-import vertical, horizontal, circle
+import vertical, horizontal, circle, radian
 from PIL import Image, ImageTk
 
 CONFIG_FILE = 'config.json'
@@ -62,7 +62,7 @@ if "save_folder" not in config:
 # Choose file frame
 choose_file_frame = tk.Frame(root, padx=10, pady=10)
 choose_file_frame.grid(row=0, column=0, sticky="n")
-functions = [[vertical.image, horizontal.image, circle.image], [vertical.video, horizontal.video, circle.video]]
+functions = [[vertical.image, horizontal.image, circle.image, radian.image], [vertical.video, horizontal.video, circle.video]]
 
 folder_info = tk.Label(choose_file_frame, text=f"Папка збереження: {config["save_folder"]}", wraplength=400, justify="left")
 folder_info.grid(row=0, column=0, sticky="w", pady=(0,20))
@@ -123,6 +123,17 @@ def change_image(image_id=image_id, canvas=canvas):
     canvas.coords(image_id, (400 - image.width) / 2, (225 - image.height) / 2)
     canvas.image = photo
     cap.release()
+
+# line_id = canvas.create_line(0, 0, 0, 0)
+# def draw_line(line_id=line_id, canvas=canvas):
+#     canvas.delete(line_id)
+#     if slitscan_type.get() == 1:
+#         x = int(int(start_x.get()) / coef) + left_x
+#         line_id = canvas.create_line(x, top_y, x, 225 - top_y, fill="red", width=2)
+#     elif slitscan_type.get() == 2:
+#         y = int(int(start_y.get()) / coef) + top_y
+#         line_id = canvas.create_line(left_x, y, 400 - left_x, y, fill="red", width=2)
+#     return line_id
 
 # image_id = canvas.create_image(0, 0, anchor="nw", image=None)
 
@@ -255,6 +266,7 @@ div2.grid(row=1, column=0)
 tk.Radiobutton(div1, text="Вертикальний", variable=slitscan_type, value=1, command=update_inputs).grid(row=0, column=0, sticky="w")
 tk.Radiobutton(div1, text="Горизонтальний", variable=slitscan_type, value=2, command=update_inputs).grid(row=0, column=1, sticky="w")
 tk.Radiobutton(div1, text="Круговий", variable=slitscan_type, value=3, command=update_inputs).grid(row=0, column=2, sticky="w")
+tk.Radiobutton(div1, text="Радіальний", variable=slitscan_type, value=4, command=update_inputs).grid(row=0, column=3, sticky="w")
 # tk.Radiobutton(div2, text="Статичний горизонтальний", variable=slitscan_type, value=4, command=update_inputs).grid(row=1, column=0, sticky="w")
 # tk.Radiobutton(div2, text="Статичний вертикальний", variable=slitscan_type, value=5, command=update_inputs).grid(row=1, column=1, sticky="w")
 
