@@ -1,9 +1,9 @@
-При першому відкритті застосунку вам запропонують обрати папку збереження, це треба зробити обов'язково, оскільки без цього застосунок не буде працювати.
-Після цього з'явиться кнопка обрання файлу який ви хочете обробити, файл повинен бути відео формату.
-Коли ви обрали файл з'являються параметри обробки.
-Вид slit-scan - якої форми буде щілина.
-З кожного виду slit-scan можна отримати картинку або відео.
-Початкові та кінцеві X, Y координати, це координати які обмежують область обробки відео, ніби ми вирізаємо вікно в оригінальному відео.
-Швидкість це скільки пікселів буде взято з кожного кадру.
-Початковий та кінцевий кадри обмежують обробку по кадрам вхідного відео.
-Також для відео додається параметр кроку, цей параметр вказує на те, що кожен n-ний кадр буде використано в обробці, n - це крок.
+When you first open the application, you will be asked to select a save folder. This must be done, otherwise the application will not work.
+After that, a button will appear for selecting the file you want to process. The file must be in video format.
+When you select a file, the processing parameters will appear.
+Slit-scan type - the shape of the slit.
+Each slit-scan type can be used to obtain an image or video.
+The start and end X and Y coordinates are the coordinates that limit the video processing area, as if we were cutting a window in the original video.
+The speed is how many pixels will be taken from each frame.
+The start and end frames limit the processing of the input video frames.
+A step parameter is also added for the video. This parameter indicates that every nth frame will be used in the processing, where n is the step.

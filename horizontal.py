@@ -56,7 +56,7 @@ def video(file_path, speed, start_x, end_x, start_y, end_y, start_frame, end_fra
         
     win = tk.Tk()
     win.title("Processing...")
-    win.geometry("300x50")
+    win.geometry("300x70")
 
     label = tk.Label(win, text="Processing... 0.0%")
     label.grid(row=0, column=0, padx=10, pady=5)
@@ -196,7 +196,7 @@ def image(file_path, speed, start_x, end_x, start_y, end_y, start_frame, end_fra
 
     win = tk.Tk()
     win.title("Processing...")
-    win.geometry("300x50")
+    win.geometry("300x70")
 
     label = tk.Label(win, text="Processing... 0.0%")
     label.grid(row=0, column=0, padx=10, pady=5)
