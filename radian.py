@@ -5,6 +5,107 @@ import tkinter as tk
 from tkinter import ttk
 import math as Math
 
+def image(file_path, speed, start_x, end_x, start_y, end_y, start_frame, end_frame, download_folder, speed_const, step):
+    cap = cv2.VideoCapture(file_path)
+
+    fps = cap.get(cv2.CAP_PROP_FPS) 
+    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    file_name = file_path.split("/")[-1].replace(".mp4", "")
+
+    v = lambda time, speed=speed, speed_const=speed_const: speed + speed_const * (time ** 2)
+    # if start_x == -1:
+    #     start_x = 0
+    # if end_x == -1:
+    #     end_x = width - 1
+    
+    if os.path.exists(f'{download_folder}/{file_name}-slitscan_rad-speed_{v(0)}-startx_{start_x}-endx_{end_x}-starty_{start_y}-endy_{end_y}-startframe_{start_frame}-endframe_{end_frame}-step_{step}.mp4'):
+        # print("file already exists")
+        tk.messagebox.showerror("Error", "File already exists.")
+        return
+
+    # image_width = 0
+    # image_height = end_y - start_y + 1
+    # h1 = 0
+    # h2 = abs(v(0))
+    # j = start_x
+    # f = False
+    # if v(0) == 0 or abs(1 / v(0)) >= end_frame - start_frame:
+    #     f = True
+    #     image_width = end_frame - start_frame
+    #     image = np.zeros((image_height, image_width, 3), dtype=np.uint8)
+    # else:
+    #     image_width = end_x - start_x + 1
+    #     image = np.zeros((image_height, image_width, 3), dtype=np.uint8)
+    image_width = end_x - start_x + 1
+    image_height = end_y - start_y + 1
+
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    out = cv2.VideoWriter(f'{download_folder}/{file_name}-slitscan_circle-speed_{v}-startx_{start_x}-endx_{end_x}-starty_{start_y}-endy_{end_y}-startframe_{start_frame}-endframe_{end_frame}-step_{step}.mp4', fourcc, 24, (image_width, image_height))
+
+    win = tk.Tk()
+    win.title("Processing...")
+    win.geometry("300x70")
+
+    label = tk.Label(win, text="Processing... 0.0%")
+    label.grid(row=0, column=0, padx=10, pady=5)
+
+    bar = ttk.Progressbar(win, length=280, mode='determinate', maximum=100)
+    bar.grid(row=1, column=0, padx=10, pady=5)
+    bar['value'] = 0
+    win.update()
+
+    g_senter = (round((start_x + end_x) / 2), round((start_y + end_y) / 2))
+    senter = (image_width // 2, image_height // 2)
+
+    phi = Math.atan(1 / ((image_width / 2) ** 2 + (image_height / 2) ** 2) ** 0.5) * 0.58
+    phi_step = phi
+    deep = round(((2 * Math.pi) / phi))
+    out_frame_count = round((end_frame - start_frame + 1 - ((2 * Math.pi) / phi)) / abs(step))
+
+    k = 0
+    image = np.zeros((image_height, image_width, 3), dtype=np.uint8)
+    while k < out_frame_count:
+
+        phi = Math.atan(1 / ((image_width / 2) ** 2 + (image_height / 2) ** 2) ** 0.5) * 0.58
+
+        if step > 0:
+            cap.set(cv2.CAP_PROP_POS_FRAMES, start_frame + k * step)
+        else:
+            cap.set(cv2.CAP_PROP_POS_FRAMES, end_frame + k * step - deep + 1)
+        while cap.isOpened():
+            ret, frame = cap.read()
+
+            if not ret:
+                break
+                
+            if phi >= Math.pi * 2:
+                break
+
+            for l in range(round((((image_width / 2) ** 2) + ((image_height / 2) ** 2)) ** 0.5)):
+                h = senter[1] - round(l * Math.sin(phi))
+                w = senter[0] + round(l * Math.cos(phi))
+                if h >= 0 and h < image_height and w >= 0 and w < image_width:
+                    image[h, w, :] = frame[g_senter[1] - round(l * Math.sin(phi)), g_senter[0] + round(l * Math.cos(phi)), :]
+
+            phi += phi_step
+
+        out.write(image)
+        k += 1
+
+        label.config(text=f"Processing... {round((k * 100) / out_frame_count, 2)}%")
+        bar['value'] = round((k * 100) / out_frame_count, 2)
+        win.update()
+
+    cap.release()
+    out.release()
+    
+    win.destroy()
+    tk.messagebox.showinfo("Done", f"Processing complete! File saved as {file_name}-slitscan_rad-speed_{v(0)}-startx_{start_x}-endx_{end_x}-starty_{start_y}-endy_{end_y}-startframe_{start_frame}-endframe_{end_frame}-step_{step}.mp4")
+    
+    os.startfile(f'{download_folder}/{file_name}-slitscan_rad-speed_{v(0)}-startx_{start_x}-endx_{end_x}-starty_{start_y}-endy_{end_y}-startframe_{start_frame}-endframe_{end_frame}-step_{step}.mp4')
+
 def image(file_path, speed, start_x, end_x, start_y, end_y, start_frame, end_frame, download_folder, speed_const):
     cap = cv2.VideoCapture(file_path)
 
@@ -22,7 +123,7 @@ def image(file_path, speed, start_x, end_x, start_y, end_y, start_frame, end_fra
     
     if os.path.exists(f'{download_folder}/{file_name}-slitscan_rad-speed_{v(0)}-startx_{start_x}-endx_{end_x}-starty_{start_y}-endy_{end_y}-startframe_{start_frame}-endframe_{end_frame}.png'):
         # print("file already exists")
-        tk.messagebox.showerror("Помилка", "Файл вже існує.")
+        tk.messagebox.showerror("Error", "File already exists.")
         return
 
     # image_width = 0
@@ -106,7 +207,7 @@ def image(file_path, speed, start_x, end_x, start_y, end_y, start_frame, end_fra
     cap.release()
     
     win.destroy()
-    tk.messagebox.showinfo("Готово", f"Обробка завершена! Файл збережено як {file_name}-slitscan_rad-speed_{v(0)}-startx_{start_x}-endx_{end_x}-starty_{start_y}-endy_{end_y}-startframe_{start_frame}-endframe_{end_frame}.png")
+    tk.messagebox.showinfo("Done", f"Processing complete! File saved as {file_name}-slitscan_rad-speed_{v(0)}-startx_{start_x}-endx_{end_x}-starty_{start_y}-endy_{end_y}-startframe_{start_frame}-endframe_{end_frame}.png")
     
     # h, w = image.shape[:2]
     # scale = min(960 / w, 540 / h)

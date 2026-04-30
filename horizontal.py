@@ -29,22 +29,25 @@ def video(file_path, speed, start_x, end_x, start_y, end_y, start_frame, end_fra
     #     end_x = width - 1
 
     if os.path.exists(f'{download_folder}/{file_name}-slitscan_v6-speed_{v}-startx_{start_x}-endx_{end_x}-starty_{start_y}-endy_{end_y}-startframe_{start_frame}-endframe_{end_frame}-step_{step}.mp4'):
-        tk.messagebox.showerror("Помилка", "Файл вже існує.")
+        tk.messagebox.showerror("Error", "File already exists.")
         return
 
     image_width = end_x - start_x + 1
     image_height = 0
+    out_frame_count = 0
     f = False
     m = []
     if v == 0 or ((1 / abs(v)) >= end_frame - start_frame):
         f = True
         image_height = end_frame - start_frame
-        for i in range(round((end_y - start_y + 1) // abs(step))):
-            m.append(np.zeros((image_height, image_width, 3), dtype=np.uint8))
+        out_frame_count = round((end_y - start_y + 1) // abs(step))
+        # for i in range(round((end_y - start_y + 1) // abs(step))):
+        #     m.append(np.zeros((image_height, image_width, 3), dtype=np.uint8))
     else:
         image_height = end_y - start_y + 1
-        for i in range(round((end_frame - start_frame + 1 - (image_height / abs(v))) / abs(step))):
-            m.append(np.zeros((image_height, image_width, 3), dtype=np.uint8))
+        out_frame_count = round((end_frame - start_frame + 1 - (image_height / abs(v))) / abs(step))
+        # for i in range(round((end_frame - start_frame + 1 - (image_height / abs(v))) / abs(step))):
+        #     m.append(np.zeros((image_height, image_width, 3), dtype=np.uint8))
 
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     out = cv2.VideoWriter(f'{download_folder}/{file_name}-slitscan_v6-speed_{v}-startx_{start_x}-endx_{end_x}-starty_{start_y}-endy_{end_y}-startframe_{start_frame}-endframe_{end_frame}-step_{step}.mp4', fourcc, 24, (image_width, image_height))
@@ -67,23 +70,24 @@ def video(file_path, speed, start_x, end_x, start_y, end_y, start_frame, end_fra
     win.update()
     
     mt = []
+    image = np.zeros((image_height, image_width, 3), dtype=np.uint8)
     k = 0
     if step > 0:
         b = start_y
     else:
         b = end_y
-    while k < len(m):
+    while k < out_frame_count:
         t = 0
         h1 = 0
         h2 = abs(v)
         j = start_y
-        image = np.zeros((image_height, image_width, 3), dtype=np.uint8)
+        image[:, :, :] = 0
 
         if not f:
             if step > 0:
                 cap.set(cv2.CAP_PROP_POS_FRAMES, start_frame + k * step)
             else:
-                cap.set(cv2.CAP_PROP_POS_FRAMES, end_frame + k * step - round(height / abs(v)) + 1)
+                cap.set(cv2.CAP_PROP_POS_FRAMES, end_frame + k * step - round(image_height / abs(v)) + 1)
         else:
             cap.set(cv2.CAP_PROP_POS_FRAMES, start_frame)
         while cap.isOpened():
@@ -139,23 +143,24 @@ def video(file_path, speed, start_x, end_x, start_y, end_y, start_frame, end_fra
             h1 = h2
             h2 += abs(v)
 
-        m[k] = image
+        # m[k] = image
+        out.write(image)
         k += 1
         b += step
 
-        label.config(text=f"Processing... {round((k * 100) / len(m), 2)}%")
-        bar['value'] = round((k * 100) / len(m), 2)
+        label.config(text=f"Processing... {round((k * 100) / out_frame_count, 2)}%")
+        bar['value'] = round((k * 100) / out_frame_count, 2)
         win.update()
         # print(round((k * 100) / len(m), 2), "%")
     
-    for i in range(len(m)):
-        out.write(m[i])
+    # for i in range(len(m)):
+    #     out.write(m[i])
 
     cap.release()
     out.release()
 
     win.destroy()
-    tk.messagebox.showinfo("Готово", f"Обробка завершена! Файл збережено як {file_name}-slitscan_v6-speed_{v}-startx_{start_x}-endx_{end_x}-starty_{start_y}-endy_{end_y}-startframe_{start_frame}-endframe_{end_frame}-step_{step}.mp4")
+    tk.messagebox.showinfo("Done", f"Processing complete! File saved as {file_name}-slitscan_v6-speed_{v}-startx_{start_x}-endx_{end_x}-starty_{start_y}-endy_{end_y}-startframe_{start_frame}-endframe_{end_frame}-step_{step}.mp4")
 
     os.startfile(f'{download_folder}/{file_name}-slitscan_v6-speed_{v}-startx_{start_x}-endx_{end_x}-starty_{start_y}-endy_{end_y}-startframe_{start_frame}-endframe_{end_frame}-step_{step}.mp4')
 
@@ -175,7 +180,7 @@ def image(file_path, speed, start_x, end_x, start_y, end_y, start_frame, end_fra
     #     end_x = width - 1
 
     if os.path.exists(f'{download_folder}/{file_name}-slitscan_v6-speed_{v}-startx_{start_x}-endx_{end_x}-starty_{start_y}-endy_{end_y}-startframe_{start_frame}-endframe_{end_frame}.png'):
-        tk.messagebox.showerror("Помилка", "Файл вже існує.")
+        tk.messagebox.showerror("Error", "File already exists.")
         return
 
     image_width = 0
@@ -275,7 +280,7 @@ def image(file_path, speed, start_x, end_x, start_y, end_y, start_frame, end_fra
     cap.release()
     
     win.destroy()
-    tk.messagebox.showinfo("Готово", f"Обробка завершена! Файл збережено як {file_name}-slitscan_v6-speed_{v}-startx_{start_x}-endx_{end_x}-starty_{start_y}-endy_{end_y}-startframe_{start_frame}-endframe_{end_frame}.png")
+    tk.messagebox.showinfo("Done", f"Processing complete! File saved as {file_name}-slitscan_v6-speed_{v}-startx_{start_x}-endx_{end_x}-starty_{start_y}-endy_{end_y}-startframe_{start_frame}-endframe_{end_frame}.png")
 
     # h, w = image.shape[:2]
     # scale = min(960 / w, 540 / h)

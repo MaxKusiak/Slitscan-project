@@ -27,7 +27,7 @@ def video(file_path, speed, start_x, end_x, start_y, end_y, start_frame, end_fra
     #     end_x = width - 1
 
     if os.path.exists(f'{download_folder}/{file_name}-slitscan_circle-speed_{v}-startx_{start_x}-endx_{end_x}-starty_{start_y}-endy_{end_y}-startframe_{start_frame}-endframe_{end_frame}-step_{step}.mp4'):
-        tk.messagebox.showerror("Помилка", "Файл вже існує.")
+        tk.messagebox.showerror("Error", "File already exists.")
         return
 
     image_width = end_x - start_x + 1
@@ -36,14 +36,17 @@ def video(file_path, speed, start_x, end_x, start_y, end_y, start_frame, end_fra
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     out = cv2.VideoWriter(f'{download_folder}/{file_name}-slitscan_circle-speed_{v}-startx_{start_x}-endx_{end_x}-starty_{start_y}-endy_{end_y}-startframe_{start_frame}-endframe_{end_frame}-step_{step}.mp4', fourcc, 24, (image_width, image_height))
 
-    senter = (round(image_width / 2), round(image_height / 2))
+    senter = (round((start_x + end_x) / 2), round((start_y + end_y) / 2))
+    senter2 = (round(image_width / 2), round(image_height / 2))
     r = v
 
     # print(round((end_frame - start_frame - ((((senter[0] ** 2 + senter[1] ** 2) ** 0.5) / abs(v)) + 1)) / abs(step)))
     # exit()
-    m = []
-    for i in range(round((end_frame - start_frame - ((((senter[0] ** 2 + senter[1] ** 2) ** 0.5) / abs(v)) + 1)) / abs(step))):
-        m.append(np.zeros((image_height, image_width, 3), dtype=np.uint8))
+    # m = []
+    # for i in range(round((end_frame - start_frame - ((((senter[0] ** 2 + senter[1] ** 2) ** 0.5) / abs(v)) + 1)) / abs(step))):
+    #     m.append(np.zeros((image_height, image_width, 3), dtype=np.uint8))
+
+    out_frame_count = round((end_frame - start_frame + 1 - (((((image_width / 2) ** 2 + (image_height / 2) ** 2) ** 0.5) / abs(v)))) / abs(step))
 
     win = tk.Tk()
     win.title("Processing...")
@@ -59,9 +62,10 @@ def video(file_path, speed, start_x, end_x, start_y, end_y, start_frame, end_fra
 
     ri = 0
     k = 0
-    while k < len(m):
+    image = np.zeros((image_height, image_width, 3), dtype=np.uint8)
+    while k < out_frame_count:
 
-        image = np.zeros((image_height, image_width, 3), dtype=np.uint8)
+        image[:, :, :] = 0
 
         ri = 0
         r = v
@@ -69,7 +73,7 @@ def video(file_path, speed, start_x, end_x, start_y, end_y, start_frame, end_fra
         if step > 0:
             cap.set(cv2.CAP_PROP_POS_FRAMES, start_frame + k * step)
         else:
-            cap.set(cv2.CAP_PROP_POS_FRAMES, end_frame + k * step - round(((senter[0] ** 2 + senter[1] ** 2) ** 0.5) / abs(v)) + 1)
+            cap.set(cv2.CAP_PROP_POS_FRAMES, end_frame + k * step - round((((image_width / 2) ** 2 + (image_height / 2) ** 2) ** 0.5) / abs(v)) + 1)
         while cap.isOpened():
             ret, frame = cap.read()
 
@@ -80,51 +84,51 @@ def video(file_path, speed, start_x, end_x, start_y, end_y, start_frame, end_fra
 
             for j in range(round(image_height / 2)):
                 try:
-                    if j + senter[1] < image_height and round(((r ** 2) - (j ** 2)) ** 0.5) + senter[0] < image_width:
-                        image[j + senter[1], round(((r ** 2) - (j ** 2)) ** 0.5) + senter[0], :] = frame[j + senter[1], round(((r ** 2) - (j ** 2)) ** 0.5) + senter[0], :]
-                    if j + senter[1] < image_height and (-1) * round(((r ** 2) - (j ** 2)) ** 0.5) + senter[0] >= start_x:
-                        image[j + senter[1], (-1) * round(((r ** 2) - (j ** 2)) ** 0.5) + senter[0], :] = frame[j + senter[1], (-1) * round(((r ** 2) - (j ** 2)) ** 0.5) - senter[0], :]
-                    if (-1) * j + senter[1] >= 0 and round(((r ** 2) - (j ** 2)) ** 0.5) + senter[0] < image_width:
-                        image[(-1) * j + senter[1], round(((r ** 2) - (j ** 2)) ** 0.5) + senter[0], :] = frame[(-1) * j + senter[1], round(((r ** 2) - (j ** 2)) ** 0.5) + senter[0], :]
-                    if (-1) * j + senter[1] >= 0 and (-1) * round(((r ** 2) - (j ** 2)) ** 0.5) + senter[0] >= start_x:
-                        image[(-1) * j + senter[1], (-1) * round(((r ** 2) - (j ** 2)) ** 0.5) + senter[0], :] = frame[(-1) * j + senter[1], (-1) * round(((r ** 2) - (j ** 2)) ** 0.5) + senter[0], :]
+                    if j + senter2[1] < image_height and round(((r ** 2) - (j ** 2)) ** 0.5) + senter2[0] < image_width:
+                        image[j + senter2[1], round(((r ** 2) - (j ** 2)) ** 0.5) + senter2[0], :] = frame[j + senter[1], round(((r ** 2) - (j ** 2)) ** 0.5) + senter[0], :]
+                    if j + senter2[1] < image_height and (-1) * round(((r ** 2) - (j ** 2)) ** 0.5) + senter2[0] >= 0:
+                        image[j + senter2[1], (-1) * round(((r ** 2) - (j ** 2)) ** 0.5) + senter2[0], :] = frame[j + senter[1], (-1) * round(((r ** 2) - (j ** 2)) ** 0.5) - senter[0], :]
+                    if (-1) * j + senter2[1] >= 0 and round(((r ** 2) - (j ** 2)) ** 0.5) + senter2[0] < image_width:
+                        image[(-1) * j + senter2[1], round(((r ** 2) - (j ** 2)) ** 0.5) + senter2[0], :] = frame[(-1) * j + senter[1], round(((r ** 2) - (j ** 2)) ** 0.5) + senter[0], :]
+                    if (-1) * j + senter2[1] >= 0 and (-1) * round(((r ** 2) - (j ** 2)) ** 0.5) + senter2[0] >= 0:
+                        image[(-1) * j + senter2[1], (-1) * round(((r ** 2) - (j ** 2)) ** 0.5) + senter2[0], :] = frame[(-1) * j + senter[1], (-1) * round(((r ** 2) - (j ** 2)) ** 0.5) + senter[0], :]
                 except:
                     pass
 
             for i in range(round(image_width / 2)):
                 try:
-                    if round(((r ** 2) - (i ** 2)) ** 0.5) + senter[1] < image_height and i + senter[0] < image_width:
-                        image[round(((r ** 2) - (i ** 2)) ** 0.5) + senter[1], i + senter[0], :] = frame[round(((r ** 2) - (i ** 2)) ** 0.5) + senter[1], i + senter[0], :]
-                    if round(((r ** 2) - (i ** 2)) ** 0.5) + senter[1] < image_height and (-1) * i + senter[0] >= start_x:
-                        image[round(((r ** 2) - (i ** 2)) ** 0.5) + senter[1], (-1) * i + senter[0], :] = frame[round(((r ** 2) - (i ** 2)) ** 0.5) + senter[1], (-1) * i + senter[0], :]
-                    if (-1) * round(((r ** 2) - (i ** 2)) ** 0.5) + senter[1] >= 0 and i + senter[0] < image_width:
-                        image[(-1) * round(((r ** 2) - (i ** 2)) ** 0.5) + senter[1], i + senter[0], :] = frame[(-1) * round(((r ** 2) - (i ** 2)) ** 0.5) + senter[1], i + senter[0], :]
-                    if (-1) * round(((r ** 2) - (i ** 2)) ** 0.5) + senter[1] >= 0 and (-1) * i + senter[0] >= start_x:
-                        image[(-1) * round(((r ** 2) - (i ** 2)) ** 0.5) + senter[1], (-1) * i + senter[0], :] = frame[(-1) * round(((r ** 2) - (i ** 2)) ** 0.5) + senter[1], (-1) * i + senter[0], :]
+                    if round(((r ** 2) - (i ** 2)) ** 0.5) + senter2[1] < image_height and i + senter2[0] < image_width:
+                        image[round(((r ** 2) - (i ** 2)) ** 0.5) + senter2[1], i + senter2[0], :] = frame[round(((r ** 2) - (i ** 2)) ** 0.5) + senter[1], i + senter[0], :]
+                    if round(((r ** 2) - (i ** 2)) ** 0.5) + senter2[1] < image_height and (-1) * i + senter2[0] >= 0:
+                        image[round(((r ** 2) - (i ** 2)) ** 0.5) + senter2[1], (-1) * i + senter2[0], :] = frame[round(((r ** 2) - (i ** 2)) ** 0.5) + senter[1], (-1) * i + senter[0], :]
+                    if (-1) * round(((r ** 2) - (i ** 2)) ** 0.5) + senter2[1] >= 0 and i + senter2[0] < image_width:
+                        image[(-1) * round(((r ** 2) - (i ** 2)) ** 0.5) + senter2[1], i + senter2[0], :] = frame[(-1) * round(((r ** 2) - (i ** 2)) ** 0.5) + senter[1], i + senter[0], :]
+                    if (-1) * round(((r ** 2) - (i ** 2)) ** 0.5) + senter2[1] >= 0 and (-1) * i + senter2[0] >= 0:
+                        image[(-1) * round(((r ** 2) - (i ** 2)) ** 0.5) + senter2[1], (-1) * i + senter2[0], :] = frame[(-1) * round(((r ** 2) - (i ** 2)) ** 0.5) + senter[1], (-1) * i + senter[0], :]
                 except:
                     pass
             
             ri += 1
 
-            if r > (senter[0] ** 2 + senter[1] ** 2) ** 0.5:
+            if r > (senter2[0] ** 2 + senter2[1] ** 2) ** 0.5:
                 break
             
-        m[k] = image
+        out.write(image)
         k += 1
 
-        label.config(text=f"Processing... {round((k * 100) / len(m), 2)}%")
-        bar['value'] = round((k * 100) / len(m), 2)
+        label.config(text=f"Processing... {round((k * 100) / out_frame_count, 2)}%")
+        bar['value'] = round((k * 100) / out_frame_count, 2)
         win.update()
         # print(round((k * 100) / len(m), 2), "%")
 
-    for i in range(len(m)):
-        out.write(m[i])
+    # for i in range(len(m)):
+    #     out.write(m[i])
 
     cap.release()
     out.release()
 
     win.destroy()
-    tk.messagebox.showinfo("Готово", f"Обробка завершена! Файл збережено як {file_name}-slitscan_circle-speed_{v}-startx_{start_x}-endx_{end_x}-startframe_{start_frame}-endframe_{end_frame}-step_{step}.mp4")
+    tk.messagebox.showinfo("Done", f"Processing complete! File saved as {file_name}-slitscan_circle-speed_{v}-startx_{start_x}-endx_{end_x}-startframe_{start_frame}-endframe_{end_frame}-step_{step}.mp4")
 
     os.startfile(f'{download_folder}/{file_name}-slitscan_circle-speed_{v}-startx_{start_x}-endx_{end_x}-starty_{start_y}-endy_{end_y}-startframe_{start_frame}-endframe_{end_frame}-step_{step}.mp4')
 
@@ -144,7 +148,7 @@ def image(file_path, speed, start_x, end_x, start_y, end_y, start_frame, end_fra
     #     end_x = width - 1
     
     if os.path.exists(f'{download_folder}/{file_name}-slitscan_circle-speed_{v(0)}-startx_{start_x}-endx_{end_x}-starty_{start_y}-endy_{end_y}-startframe_{start_frame}-endframe_{end_frame}.png'):
-        tk.messagebox.showerror("Помилка", "Файл вже існує.")
+        tk.messagebox.showerror("Error", "File already exists.")
         return
 
     ri = 0
@@ -235,7 +239,7 @@ def image(file_path, speed, start_x, end_x, start_y, end_y, start_frame, end_fra
 
     cap.release()
     
-    tk.messagebox.showinfo("Готово", f"Обробка завершена! Файл збережено як {file_name}-slitscan_circle-speed_{speed}-startx_{start_x}-endx_{end_x}-starty_{start_y}-endy_{end_y}-startframe_{start_frame}-endframe_{end_frame}.png")
+    tk.messagebox.showinfo("Done", f"Processing complete! File saved as {file_name}-slitscan_circle-speed_{speed}-startx_{start_x}-endx_{end_x}-starty_{start_y}-endy_{end_y}-startframe_{start_frame}-endframe_{end_frame}.png")
 
     # h, w = image.shape[:2]
     # scale = min(960 / w, 540 / h)
